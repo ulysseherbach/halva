@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "halva"
+dynamic = ["version"]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.15",
+    "pandas>=2.2"
+]
+requires-python = ">=3.10"
+authors = [
+    {name = "Ulysse Herbach", email = "ulysse.herbach@inria.fr"},
+]
+description = "Multivariate analysis of ordinal data with missing values and latent variables"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/ulysseherbach/halva"
+# Documentation = "https://ulysseherbach.github.io/halva"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["/.git*"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/halva"]
+
+[tool.hatch.version]
+source = "vcs"
+raw-options = {local_scheme = "no-local-version"}
+
+[tool.ruff]
+select = ["E", "F", "W"]
+line-length = 79
