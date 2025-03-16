@@ -2,7 +2,7 @@
 Halva
 =====
 
-This is an example of Python module.
+Multivariate analysis of ordinal data with missing values and latent variables.
 """
 from importlib.metadata import version as _version
 from halva.inference import infer_precision
