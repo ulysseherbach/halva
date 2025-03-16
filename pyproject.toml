@@ -21,7 +21,6 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
 ]
-license = "BSD-3-Clause"
 
 [project.urls]
 Homepage = "https://github.com/ulysseherbach/halva"
