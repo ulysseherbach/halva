@@ -115,6 +115,17 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
     theta += np.eye(p) - np.diag(np.diag(theta))
     theta = (theta + theta.T)/2
 
+    if edges is not None:
+        # Model matrix
+        model = np.zeros((p, p), dtype=int)
+        for u, v in edges:
+            model[u, v] = model[v, u] = 1
+        # Initialize manifest edges
+        for u, v in edges:
+            c1, c2 = np.sum(model[u] != 0), np.sum(model[v] != 0)
+            if c1 == 1 or c2 == 1:
+                theta[u, v] = theta[v, u] = -0.1
+
     # Export theta trajectory
     if traj:
         traj_theta = np.zeros((p, p, n_iter+1))
@@ -166,14 +177,15 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
         for i in range(n):
             if np.any(h[i]):
                 nu = m2[i, h[i]] - m1[i, h[i]]**2
-                ent_ind[i] = 0.5 * np.sum(np.log(nu))
+                ent_ind[i] = np.sum(np.log(nu))
         ent = np.mean(ent_ind)
 
-        # M step option 1: unconstrained
+        # M step
         if edge_mask is None:
+            # Option 1: unconstrained
             theta[:] = np.linalg.inv(s)
-        # M step option 2: constrained structure
         else:
+            # Option 2: constrained structure
             theta[:] = m_step_constrained(s, edge_mask)
 
         # Record objective function
@@ -197,7 +209,7 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
             np.save(f'precision_c_v1_{k+1}', theta)
 
     # Export results
-    traj_obj = np.array(traj_obj)
+    traj_obj = (n/2) * np.array(traj_obj)
     return (theta, traj_obj, traj_theta) if traj else (theta, traj_obj)
 
 

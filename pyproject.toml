@@ -27,7 +27,7 @@ Homepage = "https://github.com/ulysseherbach/halva"
 # Documentation = "https://ulysseherbach.github.io/halva"
 
 [tool.hatch.build.targets.sdist]
-exclude = ["/.git*"]
+exclude = ["/.*"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/halva"]
