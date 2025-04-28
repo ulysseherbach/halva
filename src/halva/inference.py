@@ -2,7 +2,19 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from dataclasses import dataclass
 from scipy.stats import norm, truncnorm
+
+
+@dataclass
+class InferenceResult:
+    """Results of inference."""
+
+    theta: np.ndarray
+    traj_obj: np.ndarray
+    traj_theta: np.ndarray
+    m1: np.ndarray
+    m2: np.ndarray
 
 
 # To be improved ###################################################
@@ -35,7 +47,6 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
     edges = kwargs.get('edges')
     n_iter = kwargs.get('n_iter')
     normalize = kwargs.get('norm')
-    traj = kwargs.get('traj', False)
     save = kwargs.get('save', False)
 
     # Number of samples and number of variables
@@ -127,9 +138,8 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
                 theta[u, v] = theta[v, u] = -0.1
 
     # Export theta trajectory
-    if traj:
-        traj_theta = np.zeros((p, p, n_iter+1))
-        traj_theta[:, :, 0] = theta
+    traj_theta = np.zeros((p, p, n_iter+1))
+    traj_theta[:, :, 0] = theta
 
     # Individual covariances
     s_ind = np.zeros((n, p, p))
@@ -195,8 +205,8 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
         # # Check
         # print(q)
 
-        if traj:
-            traj_theta[:, :, k+1] = theta
+        # Record theta trajectory
+        traj_theta[:, :, k+1] = theta
 
         if save and (k+1) % 10 == 0:
             fig = plt.figure(figsize=(8, 3))
@@ -210,7 +220,7 @@ def infer_precision(data: pd.DataFrame, **kwargs):  # noqa: PLR0912, PLR0914, PL
 
     # Export results
     traj_obj = (n/2) * np.array(traj_obj)
-    return (theta, traj_obj, traj_theta) if traj else (theta, traj_obj)
+    return InferenceResult(theta, traj_obj, traj_theta, m1, m2)
 
 
 def m_step_constrained(s, edge_mask, **kwargs):
